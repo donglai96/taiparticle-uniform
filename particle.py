@@ -21,13 +21,17 @@ class Particle:
     #gamma: ti.f64
     m: ti.f64
     q: ti.f64
+    t: ti.f64
+    #deltat: ti.f64
     alpha: ti.f64 #pitch angle
     alpha0: ti.f64 #equator pitch angle
 
     @ti.func
-    def initParticles(self, mass, charge):
-        self.m = mass
-        self.q = charge
+    def initParticles(self, mm, qq):
+        self.m = mm
+        self.q = qq
+        self.t = 0
+        #self.deltat = deltat
     @ti.func
     def initPos(self, x, y, z):
         self.r = ti.Vector([x, y, z]) #z would be latitude
@@ -78,7 +82,7 @@ class Particle:
         
 
     @ti.func
-    def leap_frog(self, dt, E, B, L ):
+    def leap_frog(self, dt, E, B):
 
         # The idead of lp is first half step, then boris and the leap frog
         # or 

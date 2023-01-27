@@ -9,19 +9,20 @@ import numpy as np
 from scipy import integrate
 import constants as cst
 from taichiphysics import *
+import random
 
 
 
 
 
-class Waves(object):
+class Waves_generate(object):
     """
 
     Because the operation of wave particle interaction is in taichi part,
     This code is just for initialization wave information
 
     """
-    def __init__(self,direction,frequencies, B0, ne, Bw, distribution ="Guassian"):
+    def __init__(self,direction,frequencies, B0, ne, Bw, w_width, distribution ="Gaussian"):
         self.ne = ne
         self.B0 = B0 # B0 is background and Bw is wave
         self.direction = direction # 1 or -1
@@ -30,6 +31,7 @@ class Waves(object):
         if np.abs(direction)!= 1:
             raise ValueError("The direction has to be 1 (parallel) or -1(anitiparallel)")
         self.ws =frequencies
+        self.w_width = w_width
         self.nw = self.ws.shape[0]
         print('total number of wave frequency is:',self.nw)
 
@@ -46,11 +48,11 @@ class Waves(object):
             
             Power_sum_square = 0
             self.Bwy = np.zeros(self.nw) 
-            self.w_width = self.ws[-1] - self.ws[0]
+            
             self.w_m = (self.ws[-1] + self.ws[0])/2
             
             # A Guassian distribution
-            if distribution == "Guassian":
+            if distribution == "Gaussian":
                 print("Using Guassian distribution of wave")
                 for i in range(self.nw):
                     tmp = (self.ws[i] - self.w_m)/ self.w_width
@@ -76,10 +78,12 @@ class Waves(object):
         RR = 1 + self.wpe**2 / ((self.wce - self.ws) * self.ws) 
        
         self.k = self.ws * np.sqrt(RR)/cst.C 
-        mu = cst.C * self.k / self.w
+        mu = cst.C * self.k / self.ws
         ExByp = self.direction / mu # Ex / By
 
         self.Ewx = self.Bwy * ExByp
+
+        self.phi0= np.random.rand(self.nw) * 2 * np.pi
 
 
 
@@ -91,6 +95,7 @@ class Waves(object):
         print("wave frequency", self.ws)
         print("wave amplitude Bwy", self.Bwy)
         print("wave amplitude Ewx", self.Ewx)
+        print("Initial phase", self.phi0)
 
 
 

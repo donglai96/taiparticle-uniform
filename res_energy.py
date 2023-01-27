@@ -44,7 +44,7 @@ def get_resonance_p_whistler(w, wce, n, alpha, nres):
         print('Check the pitch angle!')
     gamma = 1 / (1 - (v**2)/cst.C**2)**0.5
     p = gamma * v * cst.Me
-    return p
+    return p, k 
 
 # if __name__ == "__main__" :
 #     n = 10
