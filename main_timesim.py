@@ -5,6 +5,9 @@
 @modify date 2023-01-25 17:07:58
 @desc taichi test particle of 
 uniform background magnetic field
+
+The difference with main.py is that
+in taichi scope including time here
 """
 
 
@@ -190,6 +193,12 @@ waves = Wave.field(shape = (nw,))
 # ts  =  ti.field(ti.f64, shape=())
 dt_taichi = ti.field(ti.f64, shape=())
 dt_taichi[None] = dt
+
+
+print('Record num is', Nt//record_num)
+p_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+r_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+
 ###################################################
 
 # init function
@@ -212,34 +221,61 @@ def simulate():
         B =ti.Vector([0.0,0.0,B0])
         E = ti.Vector([0.0,0.0,0.0])
         for m in range(nw):
-            #print('dealing particle',n, m)
+            
             waves[m].get_wavefield(particles[n].r, particles[n].t)
             B += waves[m].Bw
             E += waves[m].Ew
         
-        particles[n].t += dt_taichi[None]
+        particles[n].t += dt_taichi[None] 
         particles[n].leap_frog(dt_taichi[None],E,B)
-    #print('B')
-        #particles[n].leap_frog(dt,E,B)
-    # ts += dt
-    # print('ts', ts)
+
+
+@ti.kernel
+def simulate_t():
+    for n in range(Np): # This will be Parallelized
+        
+        for tt in range(Nt): # This will be Serialized
+            B =ti.Vector([0.0,0.0,B0])
+            E = ti.Vector([0.0,0.0,0.0])
+            rrr = particles[n].r
+            ttt = particles[n].t
+            for m in range(nw):
+                
+                waves[m].get_wavefield(rrr, ttt)
+                
+                B += waves[m].Bw
+                E += waves[m].Ew
+            
+            particles[n].t += dt_taichi[None] 
+            #print('particles[n.t]',particles[n].t)
+            particles[n].leap_frog(dt_taichi[None],E,B)
+            #print('particles[n]', particles[n].r)
+
+            # save particle info
+            if tt%record_num ==0:
+                #print('tt',tt)
+                p_record_taichi[tt//record_num, n] = particles[n].p
+                r_record_taichi[tt//record_num, n] = particles[n].r
+
 
 ###################################################
 # Begin of the main loop
 start_time = time.time()
 init()
-p_record = np.zeros((Nt//record_num,Np,3))
-r_record = np.zeros((Nt//record_num,Np,3))
-for t_num in range(Nt):
+print(particles[1].r)
+simulate_t()
+
+
+# p_record = np.zeros((Nt//record_num,Np,3))
+# r_record = np.zeros((Nt//record_num,Np,3))
+# for t_num in range(Nt):
     
-    simulate()
-    if t_num == 100:
-        print(waves[0].Bw)
-    if t_num % record_num ==0:
-        for n in range(Np):
-            p_record[t_num //record_num,n,:] = particles[n].p.to_numpy()
-                #print('this is p',particles[n].p.to_numpy())
-            r_record[t_num //record_num,n,:] = particles[n].r.to_numpy()
+#     simulate()
+#     if t_num % record_num ==0:
+#         for n in range(Np):
+#             p_record[t_num //record_num,n,:] = particles[n].p.to_numpy()
+#                 #print('this is p',particles[n].p.to_numpy())
+#             r_record[t_num //record_num,n,:] = particles[n].r.to_numpy()
 print('finished')
 # End of the main loop
 ###################################################
@@ -247,17 +283,14 @@ print('finished')
 print("--- %s seconds ---" % (time.time() - start_time))
 ###################################################
 
-# plot
-# time , particles of index
-px_result = p_record[:,:,0]  
-py_result = p_record[:,:,1] 
-pz_result = p_record[:,:,2] 
-p_result = np.sqrt(px_result **2 + py_result **2 + pz_result **2)
-energy_result = erg2ev(p2e(p_result))/1000
+p_results = p_record_taichi.to_numpy()
+r_results = r_record_taichi.to_numpy()
+p_total_result = np.sqrt(p_results[:,:,0] **2 + p_results[:,:,1] **2 +p_results[:,:,2] **2)
+energy_result = erg2ev(p2e(p_total_result))/1000
+print(energy_result.shape)
 energy_0 = energy_result[0,:]
+print(energy_0.shape)
 delta_energy = np.average((energy_result - energy_result[0,:])**2,axis = 1)
-print(px_result.shape)
 plt.plot(delta_energy)
 plt.show()
-#plt.plot()
 ###################################################

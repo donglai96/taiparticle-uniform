@@ -82,7 +82,7 @@ class Waves_generate(object):
         ExByp = self.direction / mu # Ex / By
 
         self.Ewx = self.Bwy * ExByp
-
+        np.random.seed(10)
         self.phi0= np.random.rand(self.nw) * 2 * np.pi
 
 
