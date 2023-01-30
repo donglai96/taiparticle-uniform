@@ -233,23 +233,25 @@ def simulate():
 @ti.kernel
 def simulate_t():
     for n in range(Np): # This will be Parallelized
-        
+        #particles
         for tt in range(Nt): # This will be Serialized
+            #time
             B =ti.Vector([0.0,0.0,B0])
             E = ti.Vector([0.0,0.0,0.0])
-            rrr = particles[n].r
-            ttt = particles[n].t
+            rrr = particles[n].r #?
+            ttt = particles[n].t #?
+            
             for m in range(nw):
-                
-                waves[m].get_wavefield(rrr, ttt)
+                #print('ttt',ttt,n, particles[n].t)
+                #print('rrr',rrr,n, particles[n].r)
+                waves[m].get_wavefield(rrr, ttt) # get Bw and Ew
+                # if use particles[n].r and t would be wrong
                 
                 B += waves[m].Bw
                 E += waves[m].Ew
             
             particles[n].t += dt_taichi[None] 
-            #print('particles[n.t]',particles[n].t)
-            particles[n].leap_frog(dt_taichi[None],E,B)
-            #print('particles[n]', particles[n].r)
+            particles[n].leap_frog(dt_taichi[None],E,B) # change nth particle's p and r
 
             # save particle info
             if tt%record_num ==0:
