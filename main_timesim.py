@@ -10,8 +10,8 @@ The difference with main.py is that
 in taichi scope including time here
 """
 
-
-
+import shutil
+import os
 import numpy as np
 from sympy import Naturals0
 import taichi as ti
@@ -22,10 +22,11 @@ from wave_generate import Waves_generate
 from wave import Wave
 import matplotlib.pyplot as plt
 import time
+from save_input import save_input
 ###################################################
 # parameters
-id = 'test_xtao'
-print('Welcom and start!')
+id = 'test_xtao_10deg_smalltstep'
+print('Welcome and start!')
 print('id', id)
 ti.init(arch = ti.cpu,default_fp=ti.f64)
 
@@ -39,17 +40,17 @@ n0 = 10
 Np = 400
 
 # initial pitch angle
-pitch_angle_degree = 140 # to the background magnetic field!
+pitch_angle_degree = 170 # to the background magnetic field!
 
 
 # length of run (in gyroperiod)
-t_total_num = 200
+t_total_num = 1000
 
 # record x (how many step make a record)
-record_num = 25
+record_num = 250
 
 # time step (in gyroperiod)
-dt_num = 0.02
+dt_num = 0.002
 
 # resonant wave frequency (in gyrofrequency)
 w_res_num = 0.3
@@ -75,6 +76,8 @@ charge = cst.Charge * -1 # -1 is electron
 # wave direction
 direction = 1
 
+#wave_distribution = "Gaussian"
+wave_distribution = "Constant"
 
 # initial energy in eV
 # end of parameter settings
@@ -172,7 +175,7 @@ waves_init = Waves_generate(direction = direction,
                             ne = n0,
                             Bw = Bw,
                             w_width =w_width,
-                            distribution ="Gaussian")
+                            distribution =wave_distribution)
 waves_init.generate_parallel_wave()
 ws_taichi = ti.field(dtype = ti.f64,shape = (nw,))
 phi0_taichi = ti.field(dtype = ti.f64,shape = (nw,))
@@ -240,10 +243,11 @@ def simulate_t():
             E = ti.Vector([0.0,0.0,0.0])
             rrr = particles[n].r #?
             ttt = particles[n].t #?
-            
+            #print('********', particles[n].r)
             for m in range(nw):
                 #print('ttt',ttt,n, particles[n].t)
                 #print('rrr',rrr,n, particles[n].r)
+                #print('inside', particles[n].r)
                 waves[m].get_wavefield(rrr, ttt) # get Bw and Ew
                 # if use particles[n].r and t would be wrong
                 
@@ -287,6 +291,34 @@ print("--- %s seconds ---" % (time.time() - start_time))
 
 p_results = p_record_taichi.to_numpy()
 r_results = r_record_taichi.to_numpy()
+
+
+# create a new folder
+
+os.mkdir(id)
+dict_input = save_input(id,
+               B0, 
+               n0, 
+               Np,
+               pitch_angle_degree,
+               t_total_num,
+               record_num,
+               dt_num,
+               w_res_num,
+               w_lc_num,
+               w_uc_num,
+               w_width_num,
+               nw,
+               dz_num,
+               Bw,
+               wave_distribution,
+               p0,
+               k0)
+# save the p results and r results
+with open(id + '/' + 'p_r.npy','wb') as f:
+    np.save(f,p_results)
+    np.save(f,r_results)
+
 p_total_result = np.sqrt(p_results[:,:,0] **2 + p_results[:,:,1] **2 +p_results[:,:,2] **2)
 energy_result = erg2ev(p2e(p_total_result))/1000
 print(energy_result.shape)

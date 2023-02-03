@@ -66,7 +66,9 @@ class Waves_generate(object):
                     self.Bwy[i] = np.sqrt(self.Bwy[i]) * Bw / Power_sum
             elif distribution == "Constant":
                 print("Using constant distribution of wave")
-                self.Bwy = Bw / np.sqrt(self.nw)
+                #self.Bwy = Bw / np.sqrt(self.nw)
+                for i in range(self.nw):
+                    self.Bwy[i] = Bw / np.sqrt(self.nw)
             else:
                 raise ValueError("Unknown distribution")
 
