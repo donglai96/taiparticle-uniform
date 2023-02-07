@@ -42,6 +42,8 @@ def get_resonance_p_whistler(w, wce, n, alpha, nres):
     v = get_resonance_velocity(w, k, alpha, wce, nres)[0]
     if v< 0 :
         print('Check the pitch angle!')
+        print('Changing the initial solution')
+        v = get_resonance_velocity(w, k, alpha, wce, nres)[1]
     gamma = 1 / (1 - (v**2)/cst.C**2)**0.5
     p = gamma * v * cst.Me
     return p, k 

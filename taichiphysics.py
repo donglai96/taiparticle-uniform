@@ -26,9 +26,9 @@ def p2e(p, E0=M*C**2):
     return (p**2 * C**2 + E0**2)**0.5 - E0 
 
 def p2v(p,m= M):
-    gamma_m = m * np.sqrt(1 + p**2 /(m * m*C**2)) 
+    gamma_m = m * (1 + p**2 /(m * m*C**2)) **0.5
     return p/gamma_m
 
 def v2p(v,m = M):
-    gamma_m = m * 1 / np.sqrt(1 - v**2 / C**2)
+    gamma_m = m * 1 / (1 - v**2 / C**2)*0.5
     return gamma_m * v

@@ -138,10 +138,9 @@ particles = Particle.field(shape = (Np,))
 # 2. z range (in units of the wave length of iw at iw_res) = 200000
 # 
 if nw > 1:
-    iw_res = int((w - w_lc) / ((w_uc - w_lc) / (nw - 1)))
+
     dw = (w_uc - w_lc) / (nw - 1)
-    w_lc_temp = w - iw_res * dw; 
-    ws = np.array([i * dw for i in range(nw)] ) + w_lc_temp
+    ws = np.array([i * dw for i in range(nw)] ) + w_lc
     
 else:
     ws = w
@@ -236,8 +235,6 @@ def init():
         waves[m].get_wavefield(particles[n].r, particles[n].t)
         B += waves[m].Bw
         E += waves[m].Ew
-    # print('E0 at t0',E)
-    # print('B0 at t0',B)
     for n in range(Np):
         particles[n].boris_push(-dt_taichi[None]/2,E,B)
         
@@ -254,6 +251,7 @@ def simulate():
             waves[m].get_wavefield(particles[n].r, particles[n].t)
             B += waves[m].Bw
             E += waves[m].Ew
+            #print('BBB',B)
         
         particles[n].t += dt_taichi[None] 
         particles[n].leap_frog(dt_taichi[None],E,B)
@@ -281,9 +279,6 @@ def simulate_t():
                 B += waves[m].Bw
                 E += waves[m].Ew
             #print('Magnetic field!!',B)
-            # print('t', particles[n].t)
-            # print('E',E)
-            # print('B',B)
             particles[n].t += dt_taichi[None] 
             particles[n].leap_frog(dt_taichi[None],E,B) # change nth particle's p and r
             particles[n].Ep = E
@@ -306,20 +301,22 @@ def simulate_t():
 # Begin of the main loop
 start_time = time.time()
 init()
-#print(particles[1].r)
-simulate_t()
+# print(particles[1].r)
+# simulate_t()
 
 
-# p_record = np.zeros((Nt//record_num,Np,3))
-# r_record = np.zeros((Nt//record_num,Np,3))
-# for t_num in range(Nt):
+p_record = np.zeros((Nt//record_num,Np,3))
+r_record = np.zeros((Nt//record_num,Np,3))
+for t_num in range(Nt):
     
-#     simulate()
-#     if t_num % record_num ==0:
-#         for n in range(Np):
-#             p_record[t_num //record_num,n,:] = particles[n].p.to_numpy()
-#                 #print('this is p',particles[n].p.to_numpy())
-#             r_record[t_num //record_num,n,:] = particles[n].r.to_numpy()
+    simulate()
+    if t_num % record_num ==0:
+        #print('save')
+        #print(particles[n].p)
+        for n in range(Np):
+            p_record[t_num //record_num,n,:] = particles[n].p.to_numpy()
+                #print('this is p',particles[n].p.to_numpy())
+            r_record[t_num //record_num,n,:] = particles[n].r.to_numpy()
 print('finished')
 # End of the main loop
 ###################################################
@@ -327,8 +324,10 @@ print('finished')
 print("--- %s seconds ---" % (time.time() - start_time))
 ###################################################
 
-p_results = p_record_taichi.to_numpy()
-r_results = r_record_taichi.to_numpy()
+# p_results = p_record_taichi.to_numpy()
+# r_results = r_record_taichi.to_numpy()
+p_results = p_record
+r_results = r_record
 Ep_results = E_record_taichi.to_numpy()
 Bp_results = B_record_taichi.to_numpy()
 phi_results = phi_record_taichi.to_numpy()
@@ -362,7 +361,7 @@ with open(id + '/' + 'p_r.npy','wb') as f:
 with open(id + '/' + 'E_B.npy','wb') as f:
     np.save(f,Ep_results)
     np.save(f,Bp_results)
-#print(Bp_results[:,:,2])
+print(Bp_results[:,:,2])
 p_total_result = np.sqrt(p_results[:,:,0] **2 + p_results[:,:,1] **2 +p_results[:,:,2] **2)
 energy_result = erg2ev(p2e(p_total_result))/1000
 print(energy_result.shape)
@@ -371,4 +370,5 @@ print(energy_0.shape)
 delta_energy = np.average((energy_result - energy_result[0,:])**2,axis = 1)
 plt.plot(delta_energy)
 plt.show()
+print(p_results)
 ###################################################

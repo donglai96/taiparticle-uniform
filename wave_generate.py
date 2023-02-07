@@ -50,6 +50,7 @@ class Waves_generate(object):
             self.Bwy = np.zeros(self.nw) 
             
             self.w_m = (self.ws[-1] + self.ws[0])/2
+            print('medium frequency',self.w_m)
             
             # A Guassian distribution
             if distribution == "Gaussian":
@@ -84,9 +85,10 @@ class Waves_generate(object):
         ExByp = self.direction / mu # Ex / By
 
         self.Ewx = self.Bwy * ExByp
-        np.random.seed(10)
-        self.phi0= np.random.rand(self.nw) * 2 * np.pi
+        np.random.seed(66)
 
+        self.phi0= np.random.rand(self.nw) * 2 * np.pi # 0 initial
+        #self.phi0= 0
 
 
         # !! remember to get the random wave phase

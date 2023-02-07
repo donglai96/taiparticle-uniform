@@ -25,12 +25,17 @@ class Particle:
     #deltat: ti.f64
     alpha: ti.f64 #pitch angle
     alpha0: ti.f64 #equator pitch angle
-
+    phi: ti.f64 # record particle phase
+    Ep: ti.types.vector(3,ti.f64) #record E
+    Bp: ti.types.vector(3,ti.f64) #record B
     @ti.func
     def initParticles(self, mm, qq):
         self.m = mm
         self.q = qq
         self.t = 0
+        self.phi = 0
+        self.Ep = ti.Vector([0, 0, 0])
+        self.Bp = ti.Vector([0,0,0])
         #self.deltat = deltat
     @ti.func
     def initPos(self, x, y, z):
@@ -86,19 +91,13 @@ class Particle:
 
         # The idead of lp is first half step, then boris and the leap frog
         # or 
-
-        gammam = self.m * ti.sqrt(1 + self.p.norm()**2 /(self.m**2 * cst.C**2))
-        
-        v_xyz = self.p / gammam
-        #print('xyz',v_xyz)
-        
-
-        # #print('ratio',self.m)
-        self.r = self.r + 0.5 * dt * v_xyz 
         self.boris_push(dt, E, B)
         gammam = self.m * ti.sqrt(1 + self.p.norm()**2 /(self.m**2 * cst.C**2))
         
         v_xyz = self.p / gammam
         #print('xyz',v_xyz)
+        
+
+    
        
-        self.r = self.r + 0.5 * dt * v_xyz 
+        self.r += dt * v_xyz 
