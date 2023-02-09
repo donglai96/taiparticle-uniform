@@ -6,7 +6,7 @@ from taichiphysics import *
 id = input("Please enter the id:\n")
  
 print(f'You entered {id}')
-p_r_name = id + '/p_r.npy'
+p_r_name = id + '/p_r_phi.npy'
 E_B_name = id + '/E_B.npy'
 with open(p_r_name,'rb') as f:
     p_results = np.load(f)
@@ -53,8 +53,8 @@ delta_angle = np.average((pitch_angle - pitch_angle[0,:])**2,axis = 1)
 # delta_energy = np.average((energy_result - energy_result[0,:])**2,axis = 1)
 # plt.plot(delta_energy)
 # plt.show()
-record_gyro = 0.25
-ips = np.random.choice(120, 24)
+record_gyro = 0.5
+ips = np.random.choice(72, 24)
 time_total_step = p_total_result.shape[0]
 fig,axs = plt.subplots(3,3,sharex = 'col')
 tplot = record_gyro * np.arange(time_total_step )

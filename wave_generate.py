@@ -54,7 +54,7 @@ class Waves_generate(object):
             
             # A Guassian distribution
             if distribution == "Gaussian":
-                print("Using Guassian distribution of wave")
+                print("Using Guassian distribution of wave, it has some")
                 for i in range(self.nw):
                     tmp = (self.ws[i] - self.w_m)/ self.w_width
                     self.Bwy[i] = np.exp(-tmp**2)
