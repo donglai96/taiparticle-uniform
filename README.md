@@ -8,3 +8,5 @@ pip install -i https://pypi.taichi.graphics/simple/ taichi-nightly
 '''
 This is due to an issue I contributed: https://github.com/taichi-dev/taichi/issues/7255
 This is fixed but has not been released by the taichi 1.4.1
+
+An example of how to run the model is in batch_run.py
