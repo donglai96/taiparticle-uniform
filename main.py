@@ -174,13 +174,24 @@ if __name__ == '__main__':
 
 
     print('Record num is', Nt//record_num)
-    p_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
-    # E_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+    if Nt%record_num > 0:
+        
+        p_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num+1, Np))
+        # E_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
 
-    # B_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+        # B_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
 
-    r_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
-    phi_record_taichi = ti.field(dtype = ti.f64,shape = (Nt//record_num, Np))
+        r_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num+1, Np))
+        phi_record_taichi = ti.field(dtype = ti.f64,shape = (Nt//record_num+1, Np))
+    else:
+        
+        p_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+        # E_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+
+        # B_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+
+        r_record_taichi = ti.Vector.field(n=3,dtype = ti.f64,shape = (Nt//record_num, Np))
+        phi_record_taichi = ti.field(dtype = ti.f64,shape = (Nt//record_num, Np))
 
     ###################################################
 
@@ -262,6 +273,7 @@ if __name__ == '__main__':
                 # save particle info
                 if tt%record_num ==0:
                     #print('tt',tt)
+                    #print('tt//record_num',tt//record_num)
                     p_record_taichi[tt//record_num, n] = particles[n].p
                     r_record_taichi[tt//record_num, n] = particles[n].r
                     phi_record_taichi[tt//record_num, n] = particles[n].phi
@@ -273,10 +285,11 @@ if __name__ == '__main__':
     init()
     #print(particles[1].r)
     simulate_t()
-
+    
 
 
     print('finished')
+    print('The init p is',p0)
     # End of the main loop
     ###################################################
     time_used = time.time() - start_time

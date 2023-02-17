@@ -3,7 +3,7 @@ B0: 0.0014
 # density in cm^-3
 n0: 10
 # number of charged particles
-Np: 120
+Np: 72
 # initial pitchangle, in the range of [90, 180]. e.g. 160 -> 20, 170->10
 pitch_angle_degree: 170
 # length of run in gyroperiod (relativistic)
