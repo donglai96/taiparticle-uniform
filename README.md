@@ -1,7 +1,13 @@
  taiparticle-uniform
 
-trying to reproduce the study of https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2011GL046787
+A test particle code using Taichi framework.
 
+
+This code can reproduce the study of https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2011GL046787
+
+
+## About Taichi
+Taichi (https://www.taichi-lang.org/) is a high performance programming framework in python. The code can run on any device with automatically parallization.
 When installing taichi, remember to install the nightly version:
 '''
 pip install -i https://pypi.taichi.graphics/simple/ taichi-nightly
