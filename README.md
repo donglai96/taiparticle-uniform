@@ -18,7 +18,7 @@ This is fixed but has not been released by the taichi 1.4.1
 
 An example of how to run the model is in batch_run.py
 
-Update: A paper is published as: https://doi.org/10.3389/fspas.2024.1332931
+Update: A paper is published: https://doi.org/10.3389/fspas.2024.1332931 !
 
 A version in dipole field can be found at https://github.com/donglai96/taiparticle-dipole
 An oblique version can be found at https://github.com/donglai96/taiow2
