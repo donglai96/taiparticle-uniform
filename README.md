@@ -4,6 +4,7 @@ A test particle code using Taichi framework.
 
 
 This code can reproduce the study of https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2011GL046787
+![plot](./test/example.png)
 
 
 ## About Taichi
